@@ -1,0 +1,52 @@
+#include <Servo.h>
+#include <LiquidCrystal_I2C.h>
+//int obstaclePin = 13;
+int hasObstacle = LOW; // LOW MEANS NO OBSTACLE
+
+int IRSensor = 12;
+int IRSensor2 = 13;
+LiquidCrystal_I2C mylcd(0x27, 16, 2);
+
+Servo servo;
+void setup() {
+  Serial.begin(9600);
+  pinMode(IRSensor2, INPUT);
+  pinMode(IRSensor, INPUT);
+  mylcd.init();
+  mylcd.backlight();
+  mylcd.setCursor(0,1);
+  servo.attach(4);
+   
+ 
+  //servo.write(90);
+}
+
+void loop() {
+  hasObstacle = digitalRead(IRSensor);
+
+  // put your main code here, to run repeatedly:
+  //int sensorStatus = digitalRead(IRSensor);
+  //int sensor2 = digitalRead(IRSensor2);
+  //Serial.println(sensorStatus);
+  //Serial.println(sensor2);
+  //if(sensorStatus == 1){
+    if(hasObstacle == LOW){
+    //mylcd.print("Erkezo");
+    servo.write(180);
+    //delay(4000);
+    //mylcd.clear();
+    kimeno();
+  }
+}
+
+ void kimeno(){
+  delay(3000);
+  servo.write(9);
+  int count = 0;
+  
+  //count = ++count;
+  count++;
+  int sensor = digitalRead(13);
+  mylcd.print(count++);
+ }
+
