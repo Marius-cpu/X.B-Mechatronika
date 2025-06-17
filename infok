@@ -1,0 +1,14 @@
+Opel modul fontos cuccok:
+5v stepdown:
+-VIN a kocsi aksi + terminalra megy
+-GND(fold)
+-OUT- stabil 5v az arduinonak
+ENABLE- lenyegtelen igazabol, de lehet rakotni a VIN-re
+
+
+
+RAJZ:
+
+Akku +12---------- BIZTOSITEK----------VIN
+GROUND---------GND
+VOUT------------ 5V (ARDUINO
