@@ -1,68 +1,48 @@
-//rev_limiter v2.0
-//Calculate the frequency of the tacho signal you are using and adjust the following values accordingly
-//example: for a standard tacho signal on a 4 cylinder engine the frequeny is equal to the RPM divided by 30
+// Opel Corsa Z10XE sufni tuning 4500-nal tiltsa a gyujtast
+
 unsigned long previousTime = 0;
-int maxFrequency = 15; // maximum frequency in normal range, after this value shift flash will occur
-#define mosfet 7
-#define led1 8
-#define led2 9
-#define tachPin 3
-#define delai A0
-#define schakelaar 6
-int delaivalue = 0;
-int toerental = 0;
-int schakelaarstaat = 0;
-float pulsetest() //measure period of tach signal
-{
-  float ighigh, iglow;
-  ighigh = pulseIn(tachPin, HIGH);
-  iglow = pulseIn(tachPin, LOW);
-  float igcal = 0;
-  igcal = 1000 / ((ighigh / 1000) + (iglow / 1000));
-  return igcal;
+int maxFrequency = 112; // 4500 RPM = 112.5 Hz (approx.)
+//solid state relay
+#define mosfetPin 7
+//fordulatmero
+#define tachPin 3 
+
+
+int rpm = 0;
+int limiterDelay = 50; // Frekvencia(milyen hamar kapcsol)
+
+float measureFrequency() {
+  float highTime = pulseIn(tachPin, HIGH);
+  float lowTime = pulseIn(tachPin, LOW);
+  float frequency = 1000 / ((highTime / 1000) + (lowTime / 1000));
+  return frequency;
 }
 
-void setup() 
-{
+void setup() {
   Serial.begin(9600);
-  delay(5);
-  Serial.println("begincode");
-  pinMode(delai,INPUT);
-  pinMode(schakelaar,INPUT);
-  pinMode(mosfet,OUTPUT);
-  pinMode(led1,OUTPUT);
-  pinMode(led2,OUTPUT);
-  digitalWrite(mosfet,LOW);
-  digitalWrite(led1,HIGH);
-  digitalWrite(led2,LOW);
+  pinMode(mosfetPin, OUTPUT);
+  digitalWrite(mosfetPin, LOW);
 }
 
 void loop() {
-  unsigned long igcal1, igcal2, igfreq;
-      delaivalue = (analogRead(delai)/5);
-      schakelaarstaat = digitalRead(schakelaar);
   unsigned long currentTime = millis();
-  igcal1 = pulsetest();
-  igcal2 = pulsetest();
-  //to filter out some noise, we only consider our measurement valid if they are similar in value, we accept the average.
-  if ((igcal1 - igcal2) < 8)
-  {
-    igfreq = (igcal1 + igcal2) / 2;
-    toerental = (igfreq * 30);
-  }
-  Serial.print("rpm = ");
-  Serial.println(igfreq);
-      if ((igfreq > maxFrequency) && (schakelaarstaat == HIGH) && (currentTime - previousTime >= delaivalue))
-  {
-    digitalWrite(mosfet,HIGH);
-    digitalWrite(led2,HIGH);
-    digitalWrite(mosfet,LOW);
-    digitalWrite(led2,LOW);
-    previousTime = currentTime;
-  }
-  else {
-    digitalWrite(mosfet,LOW);
-    digitalWrite(led2,LOW);
+  unsigned long freq1 = measureFrequency();
+  unsigned long freq2 = measureFrequency();
+  unsigned long avgFreq;
+
+  if (abs(freq1 - freq2) < 8) {
+    avgFreq = (freq1 + freq2) / 2;
+    rpm = avgFreq * 40; // 3 hengeresre jellemzo csak
   }
 
+  Serial.print("RPM = "); //lenyegtelen hisz ott lesz a motorterbe de jo ha van
+  Serial.println(rpm);
+
+  if ((avgFreq > maxFrequency) && (currentTime - previousTime >= limiterDelay)) {
+    digitalWrite(mosfetPin, HIGH);
+    digitalWrite(mosfetPin, LOW);
+    previousTime = currentTime;
+  } else {
+    digitalWrite(mosfetPin, LOW);
+  }
 }
