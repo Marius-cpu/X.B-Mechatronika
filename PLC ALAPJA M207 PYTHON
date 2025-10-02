@@ -1,0 +1,49 @@
+PLC API
+
+Az UniPi Patron m207 rele es programozhato ledek pythonba atirasa, hogy legyen konyebb majd uj programokat letrehozni.
+
+# unipi_io.py
+"""
+Modul ami sysfs-en keresztul dolgozik
+"""
+
+# Relek betablazasa elfogadhato nevekkel
+IO_MAP = {
+    # Relays (RO = Relay Output)
+    "relay1": "/run/unipi-plc/by-slot/slot2/RO2.1/value",
+    "relay2": "/run/unipi-plc/by-slot/slot2/RO2.2/value",
+    "relay3": "/run/unipi-plc/by-slot/slot2/RO2.3/value",
+    "relay4": "/run/unipi-plc/by-slot/slot2/RO2.4/value",
+    "relay5": "/run/unipi-plc/by-slot/slot2/RO2.5/value",
+    "relay6": "/run/unipi-plc/by-slot/slot2/RO2.6/value",
+    "relay7": "/run/unipi-plc/by-slot/slot2/RO2.7/value",
+    "relay8": "/run/unipi-plc/by-slot/slot2/RO2.8/value",
+    "relay9": "/run/unipi-plc/by-slot/slot2/RO2.9/value",
+    "relay10": "/run/unipi-plc/by-slot/slot2/RO2.10/value",
+    "relay11": "/run/unipi-plc/by-slot/slot2/RO2.11/value",
+    "relay12": "/run/unipi-plc/by-slot/slot2/RO2.12/value",
+    "relay13": "/run/unipi-plc/by-slot/slot2/RO2.13/value",
+    "relay14": "/run/unipi-plc/by-slot/slot2/RO2.14/value",
+
+    # LED (ULED)
+    "led1": "/run/unipi-plc/by-slot/slot1/ULED1.1/brightness",
+    "led2": "/run/unipi-plc/by-slot/slot1/ULED1.2/brightness",
+    "led3": "/run/unipi-plc/by-slot/slot1/ULED1.3/brightness",
+    "led4": "/run/unipi-plc/by-slot/slot1/ULED1.4/brightness",
+}
+
+# Ertek relere/ledre
+def write_io(name, value):
+    path = IO_MAP.get(name)
+    if not path:
+        raise ValueError(f"Unknown IO: {name}")
+    with open(path, "w") as f:
+        f.write(str(value))
+
+# Ertek kiolvasasa
+def read_io(name):
+    path = IO_MAP.get(name)
+    if not path:
+        raise ValueError(f"Unknown IO: {name}")
+    with open(path, "r") as f:
+        return f.read().strip()
