@@ -5,6 +5,7 @@ Az UniPi Patron m207 rele es programozhato ledek pythonba atirasa, hogy legyen k
 # unipi_io.py
 """
 Modul ami sysfs-en keresztul dolgozik
+cd /run/unipi-plc/......
 """
 
 # Relek betablazasa elfogadhato nevekkel
